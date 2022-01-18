@@ -32,13 +32,14 @@ struct TopPoint{
 };
 Point spectrum[ROWS][COLUMNS];
 TopPoint peakhold[COLUMNS];
-unsigned long time;
+unsigned long timer;
 unsigned long timeauto = 0;
 
 int spectrumValue[COLUMNS];
 long int counter = 0;
 int numberCaseEffect = 0;
 int maxNumberEffect = 10;
+int initcolor;
 
 int long pwmpulse = 0;
 bool toggle = false;
@@ -60,6 +61,10 @@ void set_led_follow_music(void);
 void collumn_giam(void);
 void read_data_hand();
 void flushMatrix();
+uint8_t WheelR(int);
+uint8_t WheelG(int);
+uint8_t WheelB(int);
+
 void setup() 
 {
    Si.init(25000000L);
@@ -96,7 +101,7 @@ void setup()
    delay(100);
    
    //pixels.setBrightness(20); //set Brightness
-   pixels.setBrightness(1);
+   pixels.setBrightness(255);
    pixels.begin();
    pixels.show();  
    digitalWrite (RESET_PIN,  LOW);
@@ -112,48 +117,60 @@ void setup()
 void loop() 
 {    
   counter++;  
-  if(check_auto){
-    if((unsigned long) (millis() - timeauto) > 100000){
-      numberCaseEffect++;
-      timeauto = millis();
-      if(numberCaseEffect > maxNumberEffect){
-        numberCaseEffect = 0;
-      }
-    }
-  }
-//  clearspectrum();    // reset led về false
-//  //Đọc data khi ở chế độ hand
-//  read_data_hand();
-  
+//  if(check_auto){
+  clearspectrum();    // reset led về false
+  //Đọc data khi ở chế độ hand
+  read_data_hand();
+//  if (millis() - pwmpulse > 3000){
+//    toggle = !toggle;
+//    digitalWrite(PULSE_PIN, toggle);
+//    pwmpulse = millis();
+//  }
   //Set độ sáng cho led
-  pixels.setBrightness(brightness_led);
-  if ( (unsigned long) (millis() - time) > 1)
-  {
-    clearspectrum();    // reset led về false
-    //Đọc data khi ở chế độ hand
-    read_data_hand();
-      //Tạo xung cấp cho chân Pulse pin của si5351
-      pulse_for_si5351();
+  pixels.setBrightness(brightness_led); 
+  //Pulse sườn xuống cho chân reset si5351
+  controll_reset_si5351();
         
-      //Pulse sườn xuống cho chân reset si5351
-      controll_reset_si5351();
-        
-      //Read signal music
-      read_signal_music(); 
-      if(check_auto() ==true){
-        //nếu auto thì set led theo màu sắc
-        set_led_follow_music();
-      }
-      else {
-          //Set led follow with music
-          set_led_follow_music();
-      }
-      //Show led
+  //Read signal music
+  read_signal_music(); 
+      
+  if(check_auto() ==true){
+    //nếu auto thì set led theo màu sắc
+//    switch(numberCaseEffect){
+//        case 0: {initcolor =245; break;}
+//        case 1: {initcolor =170;break;}
+//        case 2: {initcolor =150;break;}
+//        case 3: {initcolor =200;break;}
+//        case 4: {initcolor =10;break;}
+//        case 5: {initcolor =40;break;}
+//        case 6: {initcolor =170;break;}
+//        case 7: {initcolor =30;break;}
+//        case 8: {initcolor =70;break;}
+//        case 9: {initcolor =130;break;}
+//        case 10: {initcolor =100;break;}
+//      }
+     set_led_follow_music(170);
+  }
+  else {
+     //Set led follow with music
+//     switch(numberCaseEffect){
+//        case 0: {initcolor =245;;break;}
+//        case 1: {initcolor =220;;break;}
+//        case 2: {initcolor =150;;break;}
+//        case 3: {initcolor =200;;break;}
+//        case 4: {initcolor =10;;break;}
+//        case 5: {initcolor =40;;break;}
+//        case 6: {initcolor =170;;break;}
+//        case 7: {initcolor =30;;break;}
+//        case 8: {initcolor =70;;break;}
+//        case 9: {initcolor =130;;break;}
+//        case 10: {initcolor =100;;break;}
+//      }
+     set_led_follow_music(170);
+  }
+  //Show led
   flushMatrix();
   if(counter % peakdelay ==0)topSinking(); // thời gian delay để giảm độ rơi của đỉnh
-  time = millis();
-      
-  }
 }//End Loop 
 //=====================================================================================
 
@@ -227,15 +244,6 @@ void flushMatrix()
 }
 //=====================================================================================
 //=====================================================================================
-void pulse_for_si5351(){
-  if (millis() - pwmpulse > 3000){
-    toggle = !toggle;
-    digitalWrite(PULSE_PIN, toggle);
-    pwmpulse = millis();
-  }
-}
-//=====================================================================================
-//=====================================================================================
 void controll_reset_si5351(){
   digitalWrite(RESET_PIN, HIGH);
   delayMicroseconds(3000);
@@ -247,29 +255,28 @@ void read_signal_music(){
   for(int i=0; i < COLUMNS; i++){ 
     digitalWrite(STROBE_PIN, LOW);
     delayMicroseconds(1000);
-    spectrumValue[i] = analogRead(SIGNAL_PIN_0);
-    if(spectrumValue[i] < 120)spectrumValue[i] = 0;
+    spectrumValue[i] = analogRead(SIGNAL_PIN_1);
+    if(spectrumValue[i] < 160)spectrumValue[i] = 0;
     //Ghim giá trị từ 0-1023
     spectrumValue[i] = constrain(spectrumValue[i], 0, 1023);
     spectrumValue[i] = map(spectrumValue[i], 0, 1023, 1, ROWS);
     i++;
-    spectrumValue[i] = analogRead(SIGNAL_PIN_1);
-    if(spectrumValue[i] < 120)spectrumValue[i] = 0;
+    spectrumValue[i] = analogRead(SIGNAL_PIN_0);
+    if(spectrumValue[i] < 160)spectrumValue[i] = 0;
     spectrumValue[i] = constrain(spectrumValue[i], 0, 1023);
     spectrumValue[i] = map(spectrumValue[i], 0, 1023, 1, ROWS);
-//    spectrumValue[i] = 20;
     digitalWrite(STROBE_PIN, HIGH);  
   }
 }
 //======================================================================================
 //======================================================================================
-void set_led_follow_music(){
-  for(int j = 0; j < COLUMNS; j++){
+void set_led_follow_music(int color){
+  for(int j = COLUMNS; j > 0; j--){
       for(int i = 0; i < spectrumValue[j]; i++){ 
-        spectrum[i][COLUMNS - 1 - j].active = 1;     //Led được set sáng chờ show
-        spectrum[i][COLUMNS - 1 - j].r =(12*i<255? 12*i: 255);           //COLUMN Color red
-        spectrum[i][COLUMNS - 1 - j].g =(80- 5*i > 0? 80- 5*i: 0) ;         //COLUMN Color green
-        spectrum[i][COLUMNS - 1 - j].b =0;            //COLUMN Color blue
+        spectrum[i][COLUMNS - 1 - 14 + j].active = 1;     //Led được set sáng chờ show
+        spectrum[i][COLUMNS - 1 - 14 + j].r = WheelR(color - 17*i);           //COLUMN Color red
+        spectrum[i][COLUMNS - 1 - 14 + j].g = WheelG(color - 17*i);         //COLUMN Color green
+        spectrum[i][COLUMNS - 1 - 14 + j].b = WheelB(color - 17*i);            //COLUMN Color blue
       }
       if(spectrumValue[j] - 1 > peakhold[j].position)
       {
@@ -281,10 +288,10 @@ void set_led_follow_music(){
       }
       else
       {
-        spectrum[peakhold[j].position][COLUMNS - 1 - j].active = 1;
-        spectrum[peakhold[j].position][COLUMNS - 1 - j].r = 0;  //Peak Color red
-        spectrum[peakhold[j].position][COLUMNS - 1 - j].g = 0;  //Peak Color green
-        spectrum[peakhold[j].position][COLUMNS - 1 - j].b = 255;   //Peak Color blue
+        spectrum[peakhold[j].position][COLUMNS - 1 - 14 + j].active = 1;
+        spectrum[peakhold[j].position][COLUMNS - 1 - 14 + j].r = 170;  //Peak Color red
+        spectrum[peakhold[j].position][COLUMNS - 1 - 14 + j].g = 150;  //Peak Color green
+        spectrum[peakhold[j].position][COLUMNS - 1 - 14 + j].b = 0;   //Peak Color blue
       }
   }  
 }
@@ -297,7 +304,7 @@ bool check_auto(){
 //=====================================================================================
 void read_data_hand(){
   //Đọc độ sáng
-  brightness_led =250; //map(analogRead(BRIGHTNESS_PIN), 0, 1023, 20, 255);
+  brightness_led =20; //map(analogRead(BRIGHTNESS_PIN), 0, 1023, 20, 255);
 
   //Đọc độ trễ đỉnh
   peakhorse = 1;//map(analogRead(PEAK_HORSE_PIN), 0,1023, 1,3);
@@ -307,4 +314,49 @@ void read_data_hand(){
 
   //Đọc peakcolor
   //Đọc .....
+}
+uint8_t WheelR(int WheelPos) {
+  if(WheelPos<0){
+    WheelPos = 255+ WheelPos;
+  }
+  WheelPos = 255 - WheelPos;
+  if(WheelPos < 85) {
+    return 255 - WheelPos * 3;
+  }
+  if(WheelPos < 170) {
+    WheelPos -= 85;
+    return 0;
+  }
+  WheelPos -= 170;
+  return WheelPos * 3;
+}
+uint8_t WheelG(int WheelPos) {
+  if(WheelPos<0){
+    WheelPos = 255+ WheelPos;
+  }
+  WheelPos = 255 - WheelPos;
+  if(WheelPos < 85) {
+    return 0;
+  }
+  if(WheelPos < 170) {
+    WheelPos -= 85;
+    return WheelPos * 3;
+  }
+  WheelPos -= 170;
+  return  255 - WheelPos * 3;
+}
+uint8_t WheelB(int WheelPos) {
+  if(WheelPos < 0){
+    WheelPos = 255+ WheelPos;
+  }
+  WheelPos = 255 - WheelPos;
+  if(WheelPos < 85) {
+    return WheelPos * 3;
+  }
+  if(WheelPos < 170) {
+    WheelPos -= 85;
+    return 255 - WheelPos * 3;
+  }
+  WheelPos -= 170;
+  return 0;
 }
