@@ -286,9 +286,9 @@ void set_led_follow_music(int color, int wheel){
       else
       {
         spectrum[peakhold[j].position][COLUMNS - 1 - j].active = 1;
-        spectrum[peakhold[j].position][COLUMNS - 1 - j].r = WheelB(color - wheel*j);;  //Peak Color red
-        spectrum[peakhold[j].position][COLUMNS - 1 - j].g = WheelG(color - wheel*j);;  //Peak Color green
-        spectrum[peakhold[j].position][COLUMNS - 1 - j].b = WheelR(color - wheel*j);;   //Peak Color blue
+        spectrum[peakhold[j].position][COLUMNS - 1 - j].r = WheelB(color - wheel*20);;  //Peak Color red
+        spectrum[peakhold[j].position][COLUMNS - 1 - j].g = WheelG(color - wheel*20);;  //Peak Color green
+        spectrum[peakhold[j].position][COLUMNS - 1 - j].b = WheelR(color - wheel*20);;   //Peak Color blue
       }
   }  
 }
