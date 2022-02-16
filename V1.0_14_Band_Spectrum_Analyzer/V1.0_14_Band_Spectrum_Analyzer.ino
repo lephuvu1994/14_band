@@ -127,7 +127,7 @@ void loop()
     digitalWrite(PULSE_PIN, toggle);
     pwmpulse = millis();
   }
-  if(timereffect >1000) {
+  if(timereffect > 500) {
     numberCaseEffect ++;
     timereffect =0;
     if(numberCaseEffect > maxNumberEffect){
@@ -285,10 +285,18 @@ void set_led_follow_music(int color, int wheel){
       }
       else
       {
-        spectrum[peakhold[j].position][COLUMNS - 1 - j].active = 1;
-        spectrum[peakhold[j].position][COLUMNS - 1 - j].r = WheelB(color + wheel*20);;  //Peak Color red
-        spectrum[peakhold[j].position][COLUMNS - 1 - j].g = WheelG(color + wheel*20);;  //Peak Color green
-        spectrum[peakhold[j].position][COLUMNS - 1 - j].b = WheelR(color + wheel*20);;   //Peak Color blue
+        if(numberCaseEffect % 2 ==0){
+          spectrum[peakhold[j].position][COLUMNS - 1 - j].active = 1;
+          spectrum[peakhold[j].position][COLUMNS - 1 - j].r = 255;  //Peak Color red
+          spectrum[peakhold[j].position][COLUMNS - 1 - j].g = 255;  //Peak Color green
+          spectrum[peakhold[j].position][COLUMNS - 1 - j].b = 255;   //Peak Color blue  
+        }
+        else {
+          spectrum[peakhold[j].position][COLUMNS - 1 - j].active = 1;
+          spectrum[peakhold[j].position][COLUMNS - 1 - j].r = WheelB(color + wheel*20);;  //Peak Color red
+          spectrum[peakhold[j].position][COLUMNS - 1 - j].g = WheelG(color + wheel*20);;  //Peak Color green
+          spectrum[peakhold[j].position][COLUMNS - 1 - j].b = WheelR(color + wheel*20);;   //Peak Color blue  
+        }
       }
   }  
 }
@@ -302,16 +310,16 @@ bool check_auto(){
 //=====================================================================================
 void read_data_hand(){
   //Đọc độ sáng
-  brightness_led =125; //map(analogRead(BRIGHTNESS_PIN), 0, 1023, 20, 255);
-//  brightness_led =map(analogRead(BRIGHTNESS_PIN), 0, 1023, 20, 255);
+//  brightness_led =125; //map(analogRead(BRIGHTNESS_PIN), 0, 1023, 20, 255);
+  brightness_led =map(analogRead(BRIGHTNESS_PIN), 0, 1023, 20, 255);
 
   //Đọc độ trễ đỉnh
-  peakhorse = 1;//map(analogRead(PEAK_HORSE_PIN), 0,1023, 1,3);
-//  peakhorse = map(analogRead(PEAK_HORSE_PIN), 0,1023, 1,3);
+//  peakhorse = 1;//map(analogRead(PEAK_HORSE_PIN), 0,1023, 1,3);
+  peakhorse = map(analogRead(PEAK_HORSE_PIN), 0,1023, 1,3);
   
   //Đọc độ trễ khi rơi đỉnh
-  peakdelay = 3;//map(analogRead(PEAK_DELAY_PIN), 0,1023, 1,5);
-//   peakdelay = map(analogRead(PEAK_DELAY_PIN), 0,1023, 1,4);
+//  peakdelay = 3;//map(analogRead(PEAK_DELAY_PIN), 0,1023, 1,5);
+   peakdelay = map(analogRead(PEAK_DELAY_PIN), 0,1023, 1,4);
 //  COLOR_COLUMN_PIN
   //Đọc peakcolor
   //Đọc .....
