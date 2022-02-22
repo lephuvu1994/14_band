@@ -253,13 +253,13 @@ void read_signal_music(){
     digitalWrite(STROBE_PIN, LOW);
     delayMicroseconds(1000);
     spectrumValue[i] = analogRead(SIGNAL_PIN_1);
-    if(spectrumValue[i] < 180)spectrumValue[i] = 0;
+    if(spectrumValue[i] < 120)spectrumValue[i] = 0;
     //Ghim giá trị từ 0-1023
     spectrumValue[i] = constrain(spectrumValue[i], 0, 1023);
     spectrumValue[i] = map(spectrumValue[i], 0, 1023, 1, ROWS);
     i++;
     spectrumValue[i] = analogRead(SIGNAL_PIN_0);
-    if(spectrumValue[i] < 180)spectrumValue[i] = 0;
+    if(spectrumValue[i] < 120)spectrumValue[i] = 0;
     spectrumValue[i] = constrain(spectrumValue[i], 0, 1023);
     spectrumValue[i] = map(spectrumValue[i], 0, 1023, 1, ROWS);
     digitalWrite(STROBE_PIN, HIGH);  
@@ -285,7 +285,7 @@ void set_led_follow_music(int color, int wheel){
       }
       else
       {
-        if(numberCaseEffect % 2 ==0){
+        if(numberCaseEffect % 3 ==0){
           spectrum[peakhold[j].position][COLUMNS - 1 - j].active = 1;
           spectrum[peakhold[j].position][COLUMNS - 1 - j].r = 255;  //Peak Color red
           spectrum[peakhold[j].position][COLUMNS - 1 - j].g = 255;  //Peak Color green
