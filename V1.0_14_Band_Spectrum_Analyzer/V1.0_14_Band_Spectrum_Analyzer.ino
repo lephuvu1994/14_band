@@ -9,25 +9,43 @@ Si5351mcu Si;             //Si5351mcu Board
 #define STROBE_PIN    5   //MSGEQ7 strobe pin
 #define RESET_PIN     7   //MSGEQ7 reset pin
 #define NUMPIXELS    ROWS * COLUMNS
+//Version 2
+// A2(56) = msgeq7 signal 1
+// A14(68) = msgeq7 signal 2
+// A0(54) = color A
+// A6(60) = color B
+// A8(62) = Delay column
+// A10(64) = Brigthness
+// A4(58) = Effect Time
+// A12(66) = Delay Peak
+// A13(67) = ...........
+// A1(55) , A3 chua lam gi
+
+//----------------------------------------------------
+//#define PEAK_DELAY_PIN 66 //A12 delay peak
+//#define PEAK_HORSE_PIN 60 //A6 color B
+//#define VOLUME_PIN 2  //khong co pin arduino
+//#define COLOR_COLUMN_PIN 58 //A4 color A
+//#define COLOR_PEAK_PIN 55 //A1
+//#define DELAY_PIN 62   //A8 delay column
+//#define BRIGHTNESS_PIN 64 //A10 Speed color
+//#define AUTO_PIN 11   //D11
 
 #define PEAK_DELAY_PIN 66 //A12 delay peak
 #define PEAK_HORSE_PIN 60 //A6 color B
 #define VOLUME_PIN 2  //khong co pin arduino
-#define COLOR_COLUMN_PIN 58 //A4 color A
-#define COLOR_PEAK_PIN 55 //A1
+#define COLOR_COLUMN_PIN 54 //A4 color A
+#define COLOR_PEAK_PIN_1 55 //A1
+#define COLOR_PEAK_PIN_2 57 //A3
 #define DELAY_PIN 62   //A8 delay column
 #define BRIGHTNESS_PIN 64 //A10 Speed color
+#define TIME_EFFECT 58 // Set time for effect
 #define AUTO_PIN 11   //D11
+#define NEXT_PIN 2    //D2
 
-//Speed color: độ sáng
-//color A : COLOR_COLUMN_PIN
-//A6 color B: PEAK_HORSE_PIN
-//A12 delay peak: PEAK_DELAY_PIN
-//A8 delay column: DELAY_PIN tạm thời để thời gian đổi effect
-
-
-#define SIGNAL_PIN_0 54 //A0
-#define SIGNAL_PIN_1 56 //A2
+//Version 2
+#define SIGNAL_PIN_0 68 //A2(56)
+#define SIGNAL_PIN_1 56 //A14(68)
 struct Point {
   char x, y;
   char  r, g, b;
@@ -42,7 +60,7 @@ TopPoint peakhold[COLUMNS];
 
 int spectrumValue[COLUMNS];
 long int counter = 0;
-long int timereffect = 0;
+long int currenttimereffect = 0;
 int numberCaseEffect = 0;
 int maxNumberEffect = 21;
 int initcolor;
@@ -55,6 +73,7 @@ int effect = 0;
 int peakhorse = 1;
 int peakdelay = 1;
 int brightness_led = 255;
+uint16_t maxtimeeffect = 500;
 
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, DATA_PIN, NEO_GRB + NEO_KHZ800);
 
@@ -125,9 +144,7 @@ void setup()
 void loop()
 {
   counter++;
-  timereffect ++;
-  //  if(check_auto){
-  //Đọc data khi ở chế độ hand
+  currenttimereffect ++;
   read_data_hand();
 
   //Đổi trạng thái của led báo trạng thái của mega
@@ -145,9 +162,9 @@ void loop()
   read_signal_music();
 
   if (check_auto() == true) {
-    if (timereffect > 500) {
+    if (currenttimereffect > maxtimeeffect) {
       numberCaseEffect ++;
-      timereffect = 0;
+      currenttimereffect = 0;
       if (numberCaseEffect > maxNumberEffect) {
         numberCaseEffect = 0;
       }
@@ -243,7 +260,6 @@ void loop()
           break;
         }
     }
-    //     set_led_follow_music(map(analogRead(COLOR_COLUMN_PIN), 0, 1023, 0, 255), 13);
     clearspectrum();    // reset led về false
     set_led_follow_music(initcolor, 13 , numberCaseEffect);
   }
@@ -416,6 +432,8 @@ void read_data_hand() {
   //  COLOR_COLUMN_PIN
   //Đọc peakcolor
   //Đọc .....
+  //Đọc thời gian cho 1 hiệu ứng 
+  maxtimeeffect = map(analogRead(TIME_EFFECT), 0, 1023, 200, 1000);
 }
 int WheelR(int WheelPos) {
   if (WheelPos < 0) {
