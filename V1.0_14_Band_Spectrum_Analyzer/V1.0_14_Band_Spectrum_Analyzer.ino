@@ -31,6 +31,8 @@ Si5351mcu Si;             //Si5351mcu Board
 //#define BRIGHTNESS_PIN 64 //A10 Speed color
 //#define AUTO_PIN 11   //D11
 
+//-------------------------------------------------
+//Version 1
 #define PEAK_DELAY_PIN 66 //A12 delay peak
 #define PEAK_HORSE_PIN 60 //A6 color B
 #define VOLUME_PIN 2  //khong co pin arduino
@@ -43,9 +45,28 @@ Si5351mcu Si;             //Si5351mcu Board
 #define AUTO_PIN 11   //D11
 #define NEXT_PIN 2    //D2
 
-//Version 2
-#define SIGNAL_PIN_0 68 //A2(56)
-#define SIGNAL_PIN_1 56 //A14(68)
+#define SIGNAL_PIN_0 0 //A2(56)
+#define SIGNAL_PIN_1 2 //A14(68)
+
+//-------------------------------------------------
+
+//Version2
+
+// #define PEAK_DELAY_PIN 66 //A12 delay peak
+// #define PEAK_HORSE_PIN 60 //A6 color B
+// #define VOLUME_PIN 2  //khong co pin arduino
+// #define COLOR_COLUMN_PIN 54 //A4 color A
+// #define COLOR_PEAK_PIN_1 55 //A1
+// #define COLOR_PEAK_PIN_2 57 //A3
+// #define DELAY_PIN 62   //A8 delay column
+// #define BRIGHTNESS_PIN 64 //A10 Speed color
+// #define TIME_EFFECT 58 // Set time for effect
+// #define AUTO_PIN 11   //D11
+// #define NEXT_PIN 2    //D2
+
+// //Version 2
+// #define SIGNAL_PIN_0 68 //A2(56)
+// #define SIGNAL_PIN_1 56 //A14(68)
 struct Point {
   char x, y;
   char  r, g, b;
